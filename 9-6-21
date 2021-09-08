@@ -26,10 +26,10 @@ print(f"Hello {name}!")
 while True:
     i = input("Give me a number between 50 and 100!> ")
     i = int(i)
-    if (50 <= i <= 100):
+    if (50 < i < 100):
         break
-    elif (i < 50):
+    elif (i <= 50):
         print("Too low!")
     else: 
-        i > 100
+        i >= 100
         print("Too High!")
