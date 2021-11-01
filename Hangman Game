@@ -1,0 +1,209 @@
+import random
+import string
+#word_list = ["dog", "cat"]
+#this shorter list is for running tests
+
+word_list = ["dilemma", "important", "remunerate", "unique", "embryo", "baseball", "instinct", "opponent", "feature", "result", "interactive", "recruit", "distributor", "arrangement", "birthday", "joystick", "electron", "mechanical", "engineer", "registration", "observation", "freckle", "reduction", "deadly", "integrated"]
+
+def get_random_word(lst):
+	rand_word = random.choice(lst)
+	return rand_word
+
+def hangman_display(state):
+	gallows = [
+		'''
+________
+|      |
+|
+|
+|
+|
+|___''',
+		'''
+________
+|      |
+|      O
+|
+|
+|
+|___''',
+		'''
+________
+|      |
+|      O
+|      |
+|      |
+|
+|___''',
+		'''
+________
+|      |
+|      O
+|     \\|
+|      |
+|
+|___''',
+		'''
+________
+|      |
+|      O
+|     \\|/
+|      |
+|
+|___''',
+		'''
+________
+|      |
+|      O
+|     \\|/
+|      |
+|     /
+|___''',
+		'''
+________
+|      |
+|      O
+|     \\|/
+|      |
+|     / \\
+|___''']
+
+	return gallows[state]
+
+def play_hangman(word):
+	count = len(word)
+	blanks = list("_" * count)
+	right_letters = []
+	wrong_letters = []
+	all_letters = []
+	wrong_words = []
+	status = 0
+	chances = 6
+	game_over = False
+	hints = 3
+
+	print(hangman_display(status))
+	print(' '.join(blanks))
+	print(f"This word is {count} letters long.")
+	print(f"The wrong letters are: {wrong_letters}.")
+	print(f"The wrong words are {wrong_words}.")
+	print(f"You have {chances} left to guess.")
+	print()
+
+	while not game_over:
+		guess = input("Please guess a single letter. ").lower()
+		if len(guess) == 1 and guess.isalpha():
+			if guess in all_letters:
+				guess = input("You've already guessed that letter, please guess a different letter. ").lower()
+			elif guess not in word:
+				print(f"Sorry, {guess} was incorrect.")
+				status += 1
+				chances -= 1
+				wrong_letters.append(guess)
+				all_letters.append(guess)
+				if status == 6:
+					game_over = True
+					print()
+					print(hangman_display(status))
+					print(' '.join(blanks))
+					print(f"Sorry, you're out of chances: the answer was {word}.")
+					print(f"The wrong letters are: {wrong_letters}.")
+					print(f"The wrong words are {wrong_words}.")
+					break
+			else:
+				print(f"That's right, {guess} is a correct letter.")
+				right_letters.append(guess)
+				all_letters.append(guess)
+				for i in range(count):
+					if word[i] in right_letters:
+						blanks[i] = word[i]
+				if "_" not in blanks:
+					game_over = True
+					print()
+					print(hangman_display(status))
+					print(' '.join(blanks))
+					print(f"You've completed the word correctly! It was {word}.")
+					print(f"The wrong letters are: {wrong_letters}.")
+					print(f"The wrong words are {wrong_words}.")
+					break
+		else:
+			guess = input("Sorry, that's not a valid guess, please input ONLY a single letter, please. ").lower()
+	
+		print(hangman_display(status))
+		print(' '.join(blanks))
+		print(f"This word is {count} letters long.")
+		print(f"The wrong letters are: {wrong_letters}.")
+		print(f"The wrong words are {wrong_words}.")
+		print(f"You have {chances} left to guess.")
+		print()
+
+		print("Would you like to try to guess the word now?")
+		guess_yn = input("It will not use up any chances [Y/N]. ").upper()
+		while guess_yn != "Y" and guess_yn != "N":
+			guess_yn = input("Please type only [Y/N] to continue, please. ").upper()
+		if guess_yn == "Y":
+			print()
+			guess_word = input("Okay, what's your guess? ").lower()
+			while len(guess_word) == 1:
+				guess_word = input("You have to guess an actual word, not just a letter. ").lower()
+			while guess_word in wrong_words:
+				guess_word = input("You've already guessed that word, guess a different word. ").lower()
+			if guess_word == word:
+				game_over = True
+				print()
+				print(hangman_display(status))
+				print(' '.join(word))
+				print(f"Woah, that's right! The word was {word}!")
+			else:
+				wrong_words.append(guess_word)
+				print(f"Sorry, {guess_word} wasn't the answer.")
+				print()
+		elif guess_yn == "N":
+			print("Okay, but as a reminder, you can guess the full word again after your next guess.")
+			print()
+		if hints > 0 and not game_over:
+			get_hint = input("Do you want a free hint? [Y/N] ").upper()
+			while get_hint != "Y" and get_hint != "N":
+				get_hint = input("That's not valid, please entier [Y/N] to continue. ").upper()
+			if get_hint == "Y":
+				hints -= 1
+				hint_letters = []
+				abcs = list(string.ascii_lowercase)
+				for char in abcs:
+					if char not in list(word) and char not in wrong_letters:
+						hint_letters.append(char)
+				rand_hint = random.choice(hint_letters)
+				wrong_letters.append(rand_hint)
+				all_letters.append(rand_hint)
+				print(f"Your hint is that {rand_hint} is not in the word.")
+				print(f"You have {hints} left.")
+				print()
+			elif get_hint == "N":
+				print(f"Okay, but remember, you have {hints} left if you get stuck.")
+				print()
+
+def main():
+	print("Let's play HANGMAN!")
+	print("Guess the letters that make up the mystery word.")
+	print("For each wrong guess, a part of the stick figure will be drawn.")
+	print("If the whole stick figure is drawn, it dies and you lose!")
+	print("You get 3 free hints per game and any attempts to guess the full word are penalty free.")
+	start = input("Do you want to play this game [Y/N] ").upper()
+	while start != "Y" and start != "N":
+		start = input("That's not valid, please enter [Y/N] to continue. ").upper()
+	if start == "Y":
+		new_word = get_random_word(word_list)
+		play_hangman(new_word)
+		restart = input("Do you want to play again? [Y/N] ").upper()
+		while restart == "Y":
+			new_word = get_random_word(word_list)
+			play_hangman(new_word)
+		while restart != "Y" and restart != "N":
+			restart = input("That's not valid, please enter [Y/N] to continue. ").upper()
+		if restart == "N":
+			print("Goodbye, let's play again next time!")
+	elif start == "N":
+		print("Okay then.....")
+
+if __name__ == "__main__":
+	main()
